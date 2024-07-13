@@ -291,7 +291,7 @@ end
 
 function state:isRemoteConfigsReady(playerId)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	return PlayerData.RemoteConfigsIsReady
+	return if PlayerData.RemoteConfigsIsReady then PlayerData.RemoteConfigsIsReady else false
 end
 
 function state:getRemoteConfigsContentAsString(playerId)
