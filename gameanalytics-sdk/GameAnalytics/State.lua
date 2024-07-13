@@ -286,17 +286,29 @@ end
 
 function state:getRemoteConfigsStringValue(playerId, key, defaultValue)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	return PlayerData.Configurations[key] or defaultValue
+	if PlayerData then
+		return PlayerData.Configurations[key] or defaultValue
+	else
+		return defaultValue
+	end
 end
 
 function state:isRemoteConfigsReady(playerId)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	return if PlayerData then PlayerData.RemoteConfigsIsReady else false
+	if PlayerData then
+		return PlayerData.RemoteConfigsIsReady
+	else
+		return false
+	end
 end
 
 function state:getRemoteConfigsContentAsString(playerId)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	return HTTP:JSONEncode(PlayerData.Configurations)
+	if PlayerData then
+		return HTTP:JSONEncode(PlayerData.Configurations)
+	else
+		return "{}"
+	end
 end
 
 return state
