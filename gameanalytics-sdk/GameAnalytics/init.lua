@@ -634,8 +634,10 @@ function ga:PlayerJoined(Player: Player)
 	local allowedPlatforms =
 		{ ["uwp_console"] = true, ["uwp_mobile"] = true, ["uwp_desktop"] = true, ["ps4"] = true, ["xboxone"] = true }
 
-	if allowedPlatforms[PlayerData.Platform] then
-		PlayerData.Platform = PlayerData.Platform
+	if allowedPlatforms[PlayerPlatform] then
+		PlayerData.Platform = PlayerPlatform
+	else
+		PlayerData.Platform = "uwp_desktop"
 	end
 
 	PlayerData.OS = PlayerData.Platform .. " 0.0.0"
