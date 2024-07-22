@@ -4,6 +4,7 @@ local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScriptContext = game:GetService("ScriptContext")
+local VRService = game:GetService("VRService")
 
 --[[
     The modules are required inside each function because we wouldn't
@@ -44,6 +45,8 @@ function module.initClient()
 			end
 		elseif UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
 			return "uwp_mobile"
+		elseif VRService.VREnabled then
+			return "android_meta_vr"
 		else
 			return "uwp_desktop"
 		end

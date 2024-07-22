@@ -631,8 +631,14 @@ function ga:PlayerJoined(Player: Player)
 
 	store.PlayerCache[Player.UserId] = PlayerData
 
-	local allowedPlatforms =
-		{ ["uwp_console"] = true, ["uwp_mobile"] = true, ["uwp_desktop"] = true, ["ps4"] = true, ["xboxone"] = true }
+	local allowedPlatforms = {
+		["uwp_console"] = true,
+		["uwp_mobile"] = true,
+		["uwp_desktop"] = true,
+		["ps4"] = true,
+		["xboxone"] = true,
+		["android_meta_vr"] = true,
+	}
 
 	if allowedPlatforms[PlayerPlatform] then
 		PlayerData.Platform = PlayerPlatform
