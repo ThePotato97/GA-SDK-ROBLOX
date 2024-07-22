@@ -631,10 +631,13 @@ function ga:PlayerJoined(Player: Player)
 
 	store.PlayerCache[Player.UserId] = PlayerData
 
-	PlayerData.Platform = (PlayerPlatform == "Console" and "uwp_console")
-		or (PlayerPlatform == "Mobile" and "uwp_mobile")
-		or (PlayerPlatform == "Desktop" and "uwp_desktop")
-		or "uwp_desktop"
+	local allowedPlatforms =
+		{ ["uwp_console"] = true, ["uwp_mobile"] = true, ["uwp_desktop"] = true, ["ps4"] = true, ["xboxone"] = true }
+
+	if allowedPlatforms[PlayerData.Platform] then
+		PlayerData.Platform = PlayerData.Platform
+	end
+
 	PlayerData.OS = PlayerData.Platform .. " 0.0.0"
 
 	if not countryCodeResult then

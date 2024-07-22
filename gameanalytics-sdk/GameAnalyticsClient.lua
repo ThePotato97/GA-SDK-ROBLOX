@@ -12,6 +12,8 @@ local ScriptContext = game:GetService("ScriptContext")
     a require to Postie on the server side because the networking implementation could change.
 ]]
 
+local consoleTypes = { ["ButtonCross"] = "ps4", ["ButtonA"] = "xboxone" }
+
 function module.initClient()
 	local Postie = require(script.Parent.GameAnalytics.Postie)
 
@@ -34,11 +36,16 @@ function module.initClient()
 	--Functions
 	local function getPlatform()
 		if GuiService:IsTenFootInterface() then
-			return "Console"
+			local imagePath = UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA)
+			if consoleTypes[imagePath] then
+				return consoleTypes[imagePath]
+			else
+				return "uwp_console"
+			end
 		elseif UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
-			return "Mobile"
+			return "uwp_mobile"
 		else
-			return "Desktop"
+			return "uwp_desktop"
 		end
 	end
 
