@@ -1048,8 +1048,6 @@ end
 
 local severityMap = {
 	[Enum.MessageType.MessageWarning] = ga.EGAErrorSeverity.warning,
-	[Enum.MessageType.MessageInfo] = ga.EGAErrorSeverity.info,
-	[Enum.MessageType.MessageOutput] = ga.EGAErrorSeverity.info,
 }
 
 local function MessageHandlerFromServer(message, messageType)
