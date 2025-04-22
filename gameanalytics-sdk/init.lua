@@ -4,10 +4,16 @@ local RunService = game:GetService("RunService")
 	This script determines if we should load gameanalytics server or client.
 ]]
 
-local isServer = RunService:IsServer()
+local module = {}
 
-if isServer then
+function module.server()
+	assert(RunService:IsServer(), "GameAnalytics server module can only be loaded on the server")
 	return require(script.GameAnalytics)
-else
+end
+
+function module.client()
+	assert(RunService:IsClient(), "GameAnalytics client module can only be loaded on the client")
 	return require(script.GameAnalyticsClient)
 end
+
+return module
