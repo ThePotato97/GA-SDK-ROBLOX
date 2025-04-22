@@ -10,7 +10,7 @@ export type BusinessEventOptions = EventOptions & {
 }
 
 export type ResourceEventOptions = EventOptions & {
-	flowType: number,
+	flowType: string,
 	currency: string,
 	amount: number,
 	itemType: string,
