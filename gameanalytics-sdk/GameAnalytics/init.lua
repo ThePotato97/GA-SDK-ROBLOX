@@ -21,6 +21,7 @@ local MKT = game:GetService("MarketplaceService")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalizationService = game:GetService("LocalizationService")
+local LogService = game:GetService("LogService")
 local ScriptContext = game:GetService("ScriptContext")
 local Postie = require(script.Postie)
 local OnPlayerReadyEvent
@@ -963,7 +964,13 @@ task.spawn(function()
 	end
 end)
 
-local function ErrorHandler(message, trace, scriptName, player)
+local function ErrorHandler(errorInfo)
+	local message = errorInfo.message
+	local trace = errorInfo.trace
+	local scriptName = errorInfo.scriptName
+	local severity = if errorInfo.severity then errorInfo.severity else ga.EGAErrorSeverity.error
+	local player = errorInfo.player
+
 	local scriptNameTmp = "(null)"
 	if scriptName ~= nil then
 		scriptNameTmp = scriptName
@@ -976,7 +983,8 @@ local function ErrorHandler(message, trace, scriptName, player)
 	if trace ~= nil then
 		traceTmp = trace
 	end
-	local m = scriptNameTmp .. ": message=" .. messageTmp .. ", trace=" .. traceTmp
+	local m = `{scriptNameTmp}": message="{messageTmp}", trace={traceTmp}`
+
 	if #m > 8192 then
 		m = string.sub(m, 1, 8192)
 	end
@@ -1005,7 +1013,7 @@ local function ErrorHandler(message, trace, scriptName, player)
 	end
 
 	ga:addErrorEvent(userId, {
-		severity = ga.EGAErrorSeverity.error,
+		severity = severity,
 		message = m,
 	})
 
@@ -1031,7 +1039,34 @@ local function ErrorHandlerFromServer(message, trace, Script)
 		return
 	end
 
-	return ErrorHandler(message, trace, scriptName)
+	return ErrorHandler({
+		message = message,
+		trace = trace,
+		scriptName = scriptName,
+	})
+end
+
+local severityMap = {
+	[Enum.MessageType.MessageWarning] = ga.EGAErrorSeverity.warning,
+	[Enum.MessageType.MessageInfo] = ga.EGAErrorSeverity.info,
+	[Enum.MessageType.MessageOutput] = ga.EGAErrorSeverity.info,
+}
+
+local function MessageHandlerFromServer(message, messageType)
+	--Validate
+	if not state.ReportErrors then
+		return
+	end
+
+	-- don't report certain message types
+	if severityMap[messageType] == nil then
+		return
+	end
+
+	return ErrorHandler({
+		message = message,
+		severity = severityMap[messageType],
+	})
 end
 
 local function ErrorHandlerFromClient(message, trace, scriptName, player)
@@ -1040,8 +1075,16 @@ local function ErrorHandlerFromClient(message, trace, scriptName, player)
 		return
 	end
 
-	return ErrorHandler(message, trace, scriptName, player)
+	return ErrorHandler({
+		message = message,
+		trace = trace,
+		scriptName = scriptName,
+		player = player,
+	})
 end
+
+--warning logging
+LogService.MessageOut:Connect(MessageHandlerFromServer)
 
 --Error Logging
 ScriptContext.Error:Connect(ErrorHandlerFromServer)
