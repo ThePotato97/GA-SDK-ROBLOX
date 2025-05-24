@@ -964,13 +964,7 @@ task.spawn(function()
 	end
 end)
 
-local function ErrorHandler(errorInfo)
-	local message = errorInfo.message
-	local trace = errorInfo.trace
-	local scriptName = errorInfo.scriptName
-	local severity = if errorInfo.severity then errorInfo.severity else ga.EGAErrorSeverity.error
-	local player = errorInfo.player
-
+local function ErrorHandler(message, trace, scriptName, player)
 	local scriptNameTmp = "(null)"
 	if scriptName ~= nil then
 		scriptNameTmp = scriptName
@@ -983,8 +977,7 @@ local function ErrorHandler(errorInfo)
 	if trace ~= nil then
 		traceTmp = trace
 	end
-	local m = `{scriptNameTmp}": message="{messageTmp}", trace={traceTmp}`
-
+	local m = scriptNameTmp .. ": message=" .. messageTmp .. ", trace=" .. traceTmp
 	if #m > 8192 then
 		m = string.sub(m, 1, 8192)
 	end
@@ -1013,7 +1006,7 @@ local function ErrorHandler(errorInfo)
 	end
 
 	ga:addErrorEvent(userId, {
-		severity = severity,
+		severity = ga.EGAErrorSeverity.error,
 		message = m,
 	})
 
@@ -1039,32 +1032,7 @@ local function ErrorHandlerFromServer(message, trace, Script)
 		return
 	end
 
-	return ErrorHandler({
-		message = message,
-		trace = trace,
-		scriptName = scriptName,
-	})
-end
-
-local severityMap = {
-	[Enum.MessageType.MessageWarning] = ga.EGAErrorSeverity.warning,
-}
-
-local function MessageHandlerFromServer(message, messageType)
-	--Validate
-	if not state.ReportErrors then
-		return
-	end
-
-	-- don't report certain message types
-	if severityMap[messageType] == nil then
-		return
-	end
-
-	return ErrorHandler({
-		message = message,
-		severity = severityMap[messageType],
-	})
+	return ErrorHandler(message, trace, scriptName)
 end
 
 local function ErrorHandlerFromClient(message, trace, scriptName, player)
@@ -1073,16 +1041,8 @@ local function ErrorHandlerFromClient(message, trace, scriptName, player)
 		return
 	end
 
-	return ErrorHandler({
-		message = message,
-		trace = trace,
-		scriptName = scriptName,
-		player = player,
-	})
+	return ErrorHandler(message, trace, scriptName, player)
 end
-
---warning logging
-LogService.MessageOut:Connect(MessageHandlerFromServer)
 
 --Error Logging
 ScriptContext.Error:Connect(ErrorHandlerFromServer)
